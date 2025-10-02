@@ -27,11 +27,11 @@ jobs:
         run: |
           OUTPUT=$(php index.php)
           EXPECTED_OUTPUT="Hello PHP"
-          if ["$OUTPUT" != "$EXPECTED_OUTPUT""]; then
-              echo "::error file=index.php::Output mismatch. Expected '$EXPECTED_OUTPUT', got '$OUTPUT'" 
-              exit 1 #Fait echouer le job si la sortie n'est pas cekke attendue !
+          if [ "$OUTPUT" != "$EXPECTED_OUTPUT" ]; then
+            echo "::error file=index.php::Output mismatch. Expected '$EXPECTED_OUTPUT', got '$OUTPUT'"
+            exit 1 # Fait échouer le job si la sortie n'est pas celle attendue
           else
-            echo "Test resussi : la sortie attendue est correcte !"
+            echo "Test réussi : la sortie est correcte."
           fi
   deploy:
     needs: build-and-test #Execute le CD que si le CI a réussi
