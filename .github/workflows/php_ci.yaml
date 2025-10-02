@@ -27,7 +27,7 @@ jobs:
         run: |
           # 1. Capture de la sortie du script PHP
           OUTPUT=$(php index.php)
-          EXPECTED_OUTPUT="szsjzzdh"
+          EXPECTED_OUTPUT="Hello PHP"
 
           # 2. Comparaison
           if [ "$OUTPUT" != "$EXPECTED_OUTPUT" ]; then
