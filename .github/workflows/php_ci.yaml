@@ -51,8 +51,8 @@ jobs:
       - name: Deploy via SSH/SFTP
         uses: easingthemes/ssh-deploy@main # Utilisation d'une action fiable
         with:
-          remonte_host: ${{secrets.SFTP_HOST}}
-          remote_user: ${{secrets.SFTP_USERNAME}}
-          target: ${{secrets.DEPLOY_PATH}}
-          password: ${{secrets.SFTP_PASSWORD}}
-          source: "./"
+          REMOTE_HOST: ${{secrets.SFTP_HOST}}
+          REMOTE_USER: ${{secrets.SFTP_USERNAME}}
+          SSH_PRIVATE_KEY: ${{secrets.SFTP_PASSWORD}}
+          TARGET: ${{secrets.DEPLOY_PATH}}
+          SOURCE: "./"
