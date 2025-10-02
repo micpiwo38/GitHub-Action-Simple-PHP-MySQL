@@ -1,0 +1,52 @@
+name: PHP Simple CI #nom du workflow
+
+# 1. Déclencheur (Trigger): Quand workflow doit-il s'executer ?
+on:
+  push:
+    branches: ["main"] # S'execute quand on push sur la banche main
+
+# 2. Jobs = la tache a executer (1 ou plusieurs)
+jobs:
+  build-and-test:
+    #Définit l'environement sur lequel jobs va s'executer
+    runs-on: ubuntu-latest
+    # 3. les étapes = séquences d'actions
+    steps:
+      # 1. Recuperer le code du depot
+      - name: Checkout Code
+        uses: actions/checkout@v4 # Action GitHub officielle pour cloner le dépot
+        # 2. Configurer PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2" #Installe la version spécifique de PHP
+          extensions: none
+          coverage: none
+          #3. Executer un test simple => verifié que le script s'execute sans erreur et affice une sortie attendue
+      - name: Run simple PHP Script test
+        run: |
+          OUTPUT=$(php index.php)
+          EXPECTED_OUTPUT="Hello PHP"
+          if ["$OUTPUT" != "$EXPECTED_OUTPUT""]; then
+              echo "::error file=index.php::Output mismatch. Expected '$EXPECTED_OUTPUT', got '$OUTPUT'" 
+              exit 1 #Fait echouer le job si la sortie n'est pas cekke attendue !
+          else
+            echo "Test resussi : la sortie attendue est correcte !"
+          fi
+  deploy:
+    needs: build-and-test #Execute le CD que si le CI a réussi
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      #Utilise une action tierce
+      - name: Deploy via SFTP
+        uses: Aerni/deploy-action@v1.0.3
+        with:
+          server: ${{secrets.SFTP_HOST}}
+          username: ${{secrets.SFTP_USERNAME}}
+          password: ${{secrets.SFTP_PASSWORD}}
+          port: 22
+          local-path: "./*"
+          remote-path: ${{secrets.DEPLOY_PATH}}
