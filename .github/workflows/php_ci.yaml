@@ -25,13 +25,20 @@ jobs:
           #3. Executer un test simple => verifié que le script s'execute sans erreur et affice une sortie attendue
       - name: Run simple PHP Script test
         run: |
+          # 1. Capture de la sortie du script PHP
           OUTPUT=$(php index.php)
-          EXPECTED_OUTPUT="Hello PHP"
+          EXPECTED_OUTPUT="szsjzzdh"
+
+          # 2. Comparaison
           if [ "$OUTPUT" != "$EXPECTED_OUTPUT" ]; then
-            echo "::error file=index.php::Output mismatch. Expected '$EXPECTED_OUTPUT', got '$OUTPUT'"
-            exit 1 # Fait échouer le job si la sortie n'est pas celle attendue
+            echo "--- Echec du Test ---"
+            echo "Sortie attendue : $EXPECTED_OUTPUT"
+            echo "Sortie obtenue : $OUTPUT"
+            # Affichage d'une erreur formatée pour GitHub Actions
+            echo "::error file=index.php::Le script n'a pas produit le contenu attendu."
+            exit 1 # Rend le job rouge (échec)
           else
-            echo "Test réussi : la sortie est correcte."
+            echo "Test de contenu réussi : la sortie est conforme."
           fi
   deploy:
     needs: build-and-test #Execute le CD que si le CI a réussi
@@ -41,12 +48,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       #Utilise une action tierce
-      - name: Deploy via SFTP
-        uses: Aerni/deploy-action@v1.0.3
+      - name: Deploy via SSH/SFTP
+        uses: easingthemes/ssh-deploy@main # Utilisation d'une action fiable
         with:
-          server: ${{secrets.SFTP_HOST}}
-          username: ${{secrets.SFTP_USERNAME}}
+          remonte_host: ${{secrets.SFTP_HOST}}
+          remote_user: ${{secrets.SFTP_USERNAME}}
+          target: ${{secrets.DEPLOY_PATH}}
           password: ${{secrets.SFTP_PASSWORD}}
-          port: 22
-          local-path: "./*"
-          remote-path: ${{secrets.DEPLOY_PATH}}
+          source: "./"
